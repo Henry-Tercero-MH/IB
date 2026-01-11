@@ -64,8 +64,8 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-gradient-to-br from-indigo-900/95 to-purple-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 w-full max-w-md sm:max-w-2xl md:max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-1 sm:p-4">
+      <div className="bg-gradient-to-br from-indigo-900/95 to-purple-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-white/20 w-full max-w-xs xs:max-w-sm sm:max-w-2xl md:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-white/10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
@@ -93,13 +93,13 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
         </div>
 
         {/* Lista de jugadores */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-          <div className="space-y-3 sm:space-y-4">
+        <div className="flex-1 overflow-y-auto p-2 sm:p-6">
+          <div className="space-y-2 sm:space-y-4">
             {players.map((player) => (
-              <div key={player.id} className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div key={player.id} className="bg-white/5 backdrop-blur-sm rounded-xl p-2 sm:p-4 border border-white/10 flex flex-col xs:flex-row items-stretch xs:items-center gap-2 sm:gap-4 w-full min-w-0">
                 {/* Número */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm sm:text-base">{player.id}</span>
+                <div className="w-7 h-7 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-xs sm:text-base">{player.id}</span>
                 </div>
 
                 {/* Avatar selector */}
@@ -107,7 +107,7 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
                   <select
                     value={player.avatar}
                     onChange={(e) => handleChangeAvatar(player.id, e.target.value)}
-                    className="w-12 h-12 sm:w-16 sm:h-16 text-2xl sm:text-3xl bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:bg-white/20 transition-colors appearance-none text-center"
+                    className="w-10 h-10 sm:w-16 sm:h-16 text-xl sm:text-3xl bg-white/10 border border-white/20 rounded-xl cursor-pointer hover:bg-white/20 transition-colors appearance-none text-center"
                   >
                     {AVATARES.map(avatar => (
                       <option key={avatar} value={avatar}>{avatar}</option>
@@ -121,7 +121,7 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
                   value={player.nombre}
                   onChange={(e) => handleChangeName(player.id, e.target.value)}
                   placeholder={`Jugador ${player.id}`}
-                  className="flex-1 px-3 py-2 sm:px-4 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-purple-200/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all text-sm sm:text-base break-words"
+                  className="flex-1 px-2 py-2 sm:px-4 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-purple-200/50 focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all text-xs sm:text-base break-words min-w-0"
                   maxLength={20}
                 />
 
@@ -129,9 +129,9 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
                 {players.length > 3 && (
                   <button
                     onClick={() => handleRemovePlayer(player.id)}
-                    className="w-8 h-8 sm:w-10 sm:h-10 bg-red-500/20 hover:bg-red-500/30 rounded-lg flex items-center justify-center transition-colors"
+                    className="w-7 h-7 sm:w-10 sm:h-10 bg-red-500/20 hover:bg-red-500/30 rounded-lg flex items-center justify-center transition-colors"
                   >
-                    <FaTrash className="text-red-400 text-base sm:text-lg" />
+                    <FaTrash className="text-red-400 text-xs sm:text-lg" />
                   </button>
                 )}
               </div>
@@ -142,7 +142,7 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
           {players.length < 10 && (
             <button
               onClick={handleAddPlayer}
-              className="mt-3 sm:mt-4 w-full py-3 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-dashed border-white/30 hover:border-purple-400/50 rounded-xl transition-all flex items-center justify-center gap-2 text-white font-bold text-sm sm:text-base"
+              className="mt-2 sm:mt-4 w-full py-2 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-dashed border-white/30 hover:border-purple-400/50 rounded-xl transition-all flex items-center justify-center gap-2 text-white font-bold text-xs sm:text-base"
             >
               <FaPlus /> Agregar jugador
             </button>
