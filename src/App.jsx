@@ -199,7 +199,7 @@ function App() {
               {/* Selección de Categoría */}
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                 <div className="flex items-center justify-between mb-4">
-                  <label className="text-lg font-semibold text-white flex items-center gap-2">
+                  <label className="text-base md:text-lg font-semibold text-white flex items-center gap-2 break-words">
                     📚 Categoría de palabras
                   </label>
                   {gameState.categoria === 'personalizado' && (
@@ -226,7 +226,7 @@ function App() {
                       }`}
                     >
                       <div className="text-3xl mb-2">{cat.emoji}</div>
-                      <div className="text-white font-semibold text-sm">{cat.nombre}</div>
+                      <div className="text-white font-semibold text-xs md:text-sm break-words text-center w-full">{cat.nombre}</div>
                     </button>
                   ))}
                   <button
@@ -241,7 +241,7 @@ function App() {
                     }`}
                   >
                     <div className="text-3xl mb-2">✏️</div>
-                    <div className="text-white font-semibold text-sm">Personalizado</div>
+                    <div className="text-white font-semibold text-xs md:text-sm break-words text-center w-full">Personalizado</div>
                     {tienePalabrasPersonalizadas && (
                       <div className="text-purple-300 text-xs mt-1">
                         ({palabrasPersonalizadas.length})
@@ -253,7 +253,7 @@ function App() {
 
               {/* Selección de Dificultad */}
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                <label className="text-lg font-semibold text-white mb-4 block">
+                <label className="text-base md:text-lg font-semibold text-white mb-4 block break-words">
                   🎯 Nivel de dificultad
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -271,7 +271,7 @@ function App() {
                       }`}
                     >
                       <div className="text-2xl mb-2">{dif.emoji}</div>
-                      <div className="text-white font-semibold text-sm">{dif.nombre}</div>
+                      <div className="text-white font-semibold text-xs md:text-sm break-words text-center w-full">{dif.nombre}</div>
                     </button>
                   ))}
                 </div>
@@ -283,7 +283,7 @@ function App() {
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
                     <FaUsers className="text-white text-lg" />
                   </div>
-                  <label className="text-lg font-semibold text-white">
+                  <label className="text-base md:text-lg font-semibold text-white break-words">
                     Número de jugadores
                   </label>
                 </div>
@@ -293,7 +293,7 @@ function App() {
                   max="10"
                   value={gameState.numPlayers}
                   onChange={(e) => updateGameState({ numPlayers: Math.min(10, Math.max(3, parseInt(e.target.value) || 3)) })}
-                  className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white text-xl font-bold focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all placeholder-purple-200/50"
+                  className="w-full p-3 md:p-4 rounded-xl bg-white/10 border border-white/20 text-white text-lg md:text-xl font-bold focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all placeholder-purple-200/50"
                 />
                 <p className="text-purple-200/60 text-sm mt-2">Mínimo 3 jugadores</p>
               </div>
@@ -304,7 +304,7 @@ function App() {
                   <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
                     <FaUserSecret className="text-white text-lg" />
                   </div>
-                  <label className="text-lg font-semibold text-white">
+                  <label className="text-base md:text-lg font-semibold text-white break-words">
                     Número de impostores
                   </label>
                 </div>
@@ -314,7 +314,7 @@ function App() {
                   max={gameState.numPlayers - 1}
                   value={gameState.numImpostores}
                   onChange={(e) => updateGameState({ numImpostores: Math.min(gameState.numPlayers - 1, Math.max(1, parseInt(e.target.value) || 1)) })}
-                  className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white text-xl font-bold focus:ring-2 focus:ring-amber-400 focus:border-transparent focus:outline-none transition-all placeholder-amber-200/50"
+                  className="w-full p-3 md:p-4 rounded-xl bg-white/10 border border-white/20 text-white text-lg md:text-xl font-bold focus:ring-2 focus:ring-amber-400 focus:border-transparent focus:outline-none transition-all placeholder-amber-200/50"
                 />
                 <p className="text-purple-200/60 text-sm mt-2">Al menos 1 impostor</p>
               </div>
