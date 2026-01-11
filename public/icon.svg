@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Fondo degradado -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6b21a8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo redondeado -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+
+  <!-- Icono de persona con signo de interrogación -->
+  <!-- Cabeza -->
+  <circle cx="256" cy="180" r="70" fill="white" opacity="0.95"/>
+
+  <!-- Cuerpo -->
+  <path d="M 150 420 Q 150 260 256 260 Q 362 260 362 420 Z" fill="white" opacity="0.95"/>
+
+  <!-- Signo de interrogación -->
+  <g transform="translate(256, 180)">
+    <path d="M -15 -25 Q -15 -40 0 -40 Q 15 -40 15 -25 Q 15 -15 5 -10 L 0 0"
+          stroke="url(#accent)" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <circle cx="0" cy="12" r="6" fill="url(#accent)"/>
+  </g>
+
+  <!-- Libro/Biblia estilizada en la parte inferior -->
+  <g transform="translate(256, 380)">
+    <rect x="-40" y="-25" width="80" height="50" rx="5" fill="url(#accent)" opacity="0.9"/>
+    <line x1="-40" y1="-15" x2="40" y2="-15" stroke="white" stroke-width="2" opacity="0.7"/>
+    <line x1="-40" y1="0" x2="40" y2="0" stroke="white" stroke-width="2" opacity="0.7"/>
+    <line x1="-40" y1="15" x2="40" y2="15" stroke="white" stroke-width="2" opacity="0.7"/>
+  </g>
+</svg>
