@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import './index.css';
-import { FaUserSecret, FaUsers, FaEye, FaCog } from 'react-icons/fa';
+import { FaUserSecret, FaUsers, FaEye, FaCog, FaCheckCircle, FaTimesCircle, FaTrophy, FaShareAlt } from 'react-icons/fa';
 import { BsLightningChargeFill } from 'react-icons/bs';
+import { MdHowToVote } from 'react-icons/md';
 import shapes from './assets/shapes.svg';
 import { useAudio } from './hooks/useAudio';
 import { usePalabras } from './hooks/usePalabras';
 import { useGameState } from './hooks/useGameState';
+import { useConfetti } from './hooks/useConfetti';
 import AudioControl from './components/AudioControl';
 import PalabrasModal from './components/PalabrasModal';
 import InstallPWA from './components/InstallPWA';
 import RestoreGameDialog from './components/RestoreGameDialog';
+import PlayersSetup from './components/PlayersSetup';
+import ShareResults from './components/ShareResults';
 import { CATEGORIAS, DIFICULTADES } from './data/palabras';
 
 function App() {
@@ -19,6 +23,9 @@ function App() {
   // Estado local para modales
   const [showPalabrasModal, setShowPalabrasModal] = useState(false);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [showPlayersSetup, setShowPlayersSetup] = useState(false);
+  const [showShareResults, setShowShareResults] = useState(false);
+  const [shareData, setShareData] = useState(null);
 
   // Hooks
   const { playSound } = useAudio();
@@ -55,8 +62,15 @@ function App() {
       return;
     }
 
+    playSound('buttonClick');
+    setShowPlayersSetup(true);
+  };
+
+  const handleStartWithPlayers = (players) => {
+    setShowPlayersSetup(false);
     playSound('gameStart');
 
+    const palabrasDisponibles = obtenerPalabras(gameState.categoria, gameState.dificultad);
     const palabraElegida = palabrasDisponibles[Math.floor(Math.random() * palabrasDisponibles.length)];
     const cartasArr = Array(gameState.numImpostores).fill({ rol: 'impostor' }).concat(
       Array(gameState.numPlayers - gameState.numImpostores).fill({ rol: 'palabra', palabra: palabraElegida })
@@ -66,7 +80,8 @@ function App() {
       palabra: palabraElegida,
       cartas: shuffle(cartasArr),
       current: 0,
-      step: 'cartas'
+      step: 'cartas',
+      players: players
     });
   };
 
@@ -79,6 +94,36 @@ function App() {
       playSound('gameEnd');
       updateGameState({ step: 'listo' });
     }
+  };
+
+  const handleStartVoting = () => {
+    playSound('buttonClick');
+    updateGameState({
+      step: 'votacion',
+      votos: [],
+      timerSeconds: 180 // 3 minutos por defecto
+    });
+  };
+
+  const handleVote = (votedPlayer) => {
+    const newVotos = [...(gameState.votos || []), votedPlayer];
+
+    if (newVotos.length >= gameState.numPlayers) {
+      // Todos votaron, ir a resultados
+      updateGameState({
+        votos: newVotos,
+        step: 'resultados'
+      });
+      playSound('gameEnd');
+    } else {
+      updateGameState({ votos: newVotos });
+      playSound('buttonClick');
+    }
+  };
+
+  const handleSkipVoting = () => {
+    playSound('buttonClick');
+    updateGameState({ step: 'resultados' });
   };
 
   const handleReset = () => {
@@ -98,7 +143,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-900 py-10 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-900 animate-gradient py-10 px-4 relative overflow-hidden">
       <AudioControl />
       <InstallPWA />
 
@@ -111,11 +156,27 @@ function App() {
         />
       )}
 
-      {/* Efectos de fondo */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+      {/* Efectos de fondo mejorados */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
         <img src={shapes} alt="Background Shapes" className="w-full h-full object-cover opacity-5" />
+        {/* Partículas flotantes */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-purple-400/20 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 4}s`
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="max-w-4xl mx-auto relative">
@@ -276,6 +337,7 @@ function App() {
               jugador={gameState.current + 1}
               total={gameState.cartas.length}
               onNext={handleNext}
+              player={gameState.players?.[gameState.current]}
             />
           )}
 
@@ -289,14 +351,49 @@ function App() {
                 <p className="text-lg text-purple-200/90 mb-6 max-w-md">
                   Todos han visto su carta. Es hora de descubrir quién es el impostor.
                 </p>
-                <button
-                  onClick={handleReset}
-                  className="bg-white/20 hover:bg-white/30 border border-white/30 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:scale-105 active:scale-95 transition-all duration-200"
-                >
-                  Nueva partida
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleStartVoting}
+                    className="bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-purple-500/50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-2"
+                  >
+                    <MdHowToVote className="text-xl" />
+                    Iniciar votación
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    className="bg-white/20 hover:bg-white/30 border border-white/30 text-white px-8 py-3 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all duration-200"
+                  >
+                    Nueva partida
+                  </button>
+                </div>
               </div>
             </div>
+          )}
+
+          {gameState.step === 'votacion' && (
+            <VotingPhase
+              numPlayers={gameState.numPlayers}
+              votos={gameState.votos || []}
+              timerSeconds={gameState.timerSeconds}
+              onVote={handleVote}
+              onSkip={handleSkipVoting}
+              players={gameState.players || []}
+            />
+          )}
+
+          {gameState.step === 'resultados' && (
+            <ResultsPhase
+              cartas={gameState.cartas}
+              votos={gameState.votos || []}
+              numPlayers={gameState.numPlayers}
+              palabra={gameState.palabra}
+              onReset={handleReset}
+              players={gameState.players || []}
+              onShare={(data) => {
+                setShareData(data);
+                setShowShareResults(true);
+              }}
+            />
           )}
         </div>
       </div>
@@ -310,12 +407,30 @@ function App() {
         onEliminar={eliminarPalabra}
         onLimpiar={limpiarPalabras}
       />
+
+      {/* Modal de configuración de jugadores */}
+      <PlayersSetup
+        isOpen={showPlayersSetup}
+        onClose={() => setShowPlayersSetup(false)}
+        onStart={handleStartWithPlayers}
+        numPlayers={gameState.numPlayers}
+        onChangeNumPlayers={(num) => updateGameState({ numPlayers: num })}
+      />
+
+      {/* Modal de compartir resultados */}
+      {shareData && (
+        <ShareResults
+          isOpen={showShareResults}
+          onClose={() => setShowShareResults(false)}
+          gameData={shareData}
+        />
+      )}
     </div>
   );
 }
 
 // Componente para el efecto de destapar carta
-function CardReveal({ palabra, carta, jugador, total, onNext }) {
+function CardReveal({ palabra, carta, jugador, total, onNext, player }) {
   const [reveal, setReveal] = useState(false);
   const { playSound } = useAudio();
 
@@ -335,15 +450,20 @@ function CardReveal({ palabra, carta, jugador, total, onNext }) {
     <div className="flex flex-col items-center gap-8">
       {/* Badge del jugador */}
       <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-purple-500/30 to-blue-500/30 border border-purple-400/40 rounded-full backdrop-blur-sm">
-        <span className="text-white/80 text-sm font-medium">Jugador</span>
-        <span className="text-white text-2xl font-bold">{jugador}</span>
-        <span className="text-white/60 text-sm">de {total}</span>
+        {player?.avatar && (
+          <span className="text-2xl">{player.avatar}</span>
+        )}
+        <span className="text-white text-xl font-bold">
+          {player?.nombre || `Jugador ${jugador}`}
+        </span>
+        <span className="text-white/60 text-sm">({jugador} de {total})</span>
       </div>
 
-      {/* Carta interactiva */}
-      <div className="relative">
+      {/* Carta interactiva con efecto 3D */}
+      <div className="relative perspective-1000">
         <div
-          className="w-72 h-[450px] flex items-center justify-center cursor-pointer relative select-none group"
+          className={`w-72 h-[450px] flex items-center justify-center cursor-pointer relative select-none group transition-all duration-500 ${reveal ? 'animate-flip-3d' : ''}`}
+          style={{ transformStyle: 'preserve-3d' }}
           onMouseDown={handlePress}
           onMouseUp={handleRelease}
           onMouseLeave={handleRelease}
@@ -352,31 +472,31 @@ function CardReveal({ palabra, carta, jugador, total, onNext }) {
         >
           {/* Card tapada */}
           {!reveal && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 rounded-3xl shadow-2xl border-4 border-purple-400/50 z-10 transition-all duration-300 group-hover:scale-105 group-active:scale-95">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 via-purple-500 to-blue-600 rounded-3xl shadow-2xl border-4 border-purple-400/50 z-10 transition-all duration-300 group-hover:scale-105 group-active:scale-95 animate-glow-pulse">
               <div className="text-center p-8">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 mx-auto animate-pulse">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 mx-auto animate-bounce">
                   <FaEye className="text-white text-2xl" />
                 </div>
                 <span className="text-white text-lg font-bold text-center block mb-2">
                   Presiona para ver
                 </span>
                 <span className="text-purple-100 text-sm">tu carta secreta</span>
-                <span className="mt-6 text-4xl block animate-bounce">👆</span>
+                <span className="mt-6 text-4xl block animate-float">👆</span>
               </div>
             </div>
           )}
 
           {/* Card destapada */}
-          <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl shadow-2xl border-4 transition-all duration-300 ${
+          <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl shadow-2xl border-4 transition-all duration-500 ${
             esImpostor
               ? 'bg-gradient-to-br from-red-600 via-red-500 to-orange-600 border-red-400/50'
               : 'bg-gradient-to-br from-emerald-500 via-teal-500 to-blue-500 border-emerald-400/50'
-          } ${reveal ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          } ${reveal ? 'opacity-100 scale-100 animate-bounce-in' : 'opacity-0 scale-90'}`}>
             <div className="text-center p-8">
               {esImpostor && (
-                <FaUserSecret className="text-white/80 text-6xl mb-4 mx-auto" />
+                <FaUserSecret className="text-white/80 text-6xl mb-4 mx-auto animate-scale-in" />
               )}
-              <span className={`text-white text-5xl font-black tracking-wide uppercase ${reveal ? 'animate-pulse' : ''}`}>
+              <span className={`text-white text-5xl font-black tracking-wide uppercase ${reveal ? 'animate-scale-in' : ''}`}>
                 {esImpostor ? 'Impostor' : palabra}
               </span>
               {!esImpostor && (
@@ -399,6 +519,263 @@ function CardReveal({ palabra, carta, jugador, total, onNext }) {
       >
         {jugador < total ? 'Siguiente jugador →' : '¡Comenzar! 🎮'}
       </button>
+    </div>
+  );
+}
+
+// Componente para la fase de votación
+function VotingPhase({ numPlayers, votos, timerSeconds, onVote, onSkip, players }) {
+  const [timeLeft, setTimeLeft] = useState(timerSeconds);
+  const { playSound } = useAudio();
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          playSound('gameEnd');
+          return 0;
+        }
+        if (prev <= 10) {
+          playSound('buttonClick');
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timeLeft, playSound]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const votosRestantes = numPlayers - votos.length;
+
+  return (
+    <div className="flex flex-col items-center gap-6">
+      {/* Timer */}
+      <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-2xl border border-purple-400/30 px-8 py-4">
+        <div className="text-center">
+          <p className="text-purple-200/70 text-sm mb-1">Tiempo de discusión</p>
+          <p className={`text-4xl font-bold ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+            {formatTime(timeLeft)}
+          </p>
+        </div>
+      </div>
+
+      {/* Título */}
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-white mb-2">Fase de Votación</h2>
+        <p className="text-purple-200/80">
+          {votosRestantes > 0 ? `Faltan ${votosRestantes} voto${votosRestantes !== 1 ? 's' : ''}` : '¡Todos votaron!'}
+        </p>
+      </div>
+
+      {/* Grid de jugadores */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-2xl">
+        {Array.from({ length: numPlayers }, (_, i) => {
+          const player = players[i];
+          return (
+            <button
+              key={i}
+              onClick={() => onVote(i + 1)}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl p-6 border border-white/20 hover:border-purple-400/50 transition-all hover:scale-105 active:scale-95"
+            >
+              <div className="text-center">
+                <div className="text-3xl mb-2">{player?.avatar || '👤'}</div>
+                <p className="text-white font-bold text-lg">{player?.nombre || `Jugador ${i + 1}`}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Contador de votos */}
+      {votos.length > 0 && (
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+          <p className="text-purple-200/70 text-sm text-center">
+            Votos registrados: {votos.length} de {numPlayers}
+          </p>
+        </div>
+      )}
+
+      {/* Botón para saltar */}
+      <button
+        onClick={onSkip}
+        className="mt-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white px-6 py-3 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all duration-200"
+      >
+        Ver resultados sin votar
+      </button>
+    </div>
+  );
+}
+
+// Componente para los resultados
+function ResultsPhase({ cartas, votos, numPlayers, palabra, onReset, players, onShare }) {
+  const { playSound } = useAudio();
+  const { fireCelebration, fireDefeatConfetti } = useConfetti();
+  const [showResults, setShowResults] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowResults(true);
+      playSound('gameEnd');
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [playSound]);
+
+  // Encontrar índices de los impostores
+  const impostorIndices = cartas
+    .map((carta, idx) => carta.rol === 'impostor' ? idx + 1 : null)
+    .filter(idx => idx !== null);
+
+  // Contar votos
+  const voteCount = {};
+  votos.forEach(voto => {
+    voteCount[voto] = (voteCount[voto] || 0) + 1;
+  });
+
+  // Jugador más votado
+  const mostVoted = Object.entries(voteCount).sort((a, b) => b[1] - a[1])[0];
+  const mostVotedPlayer = mostVoted ? parseInt(mostVoted[0]) : null;
+
+  // Verificar si los buenos ganaron
+  const buenosGanaron = mostVotedPlayer && impostorIndices.includes(mostVotedPlayer);
+
+  // Disparar confetti cuando se muestran los resultados
+  useEffect(() => {
+    if (showResults) {
+      if (buenosGanaron) {
+        fireCelebration();
+      } else {
+        fireDefeatConfetti();
+      }
+    }
+  }, [showResults, buenosGanaron, fireCelebration, fireDefeatConfetti]);
+
+  return (
+    <div className={`flex flex-col items-center gap-6 ${showResults ? 'animate-slide-up' : 'opacity-0'}`}>
+      {/* Resultado principal */}
+      <div className={`bg-gradient-to-br ${buenosGanaron ? 'from-green-400/20 to-emerald-500/20 border-green-400/30' : 'from-red-400/20 to-orange-500/20 border-red-400/30'} backdrop-blur-sm rounded-3xl border px-12 py-12 flex flex-col items-center animate-bounce-in`}>
+        <div className={`w-20 h-20 bg-gradient-to-br ${buenosGanaron ? 'from-green-400 to-emerald-500' : 'from-red-400 to-orange-500'} rounded-full flex items-center justify-center mb-6 ${showResults ? 'animate-bounce' : ''}`}>
+          {buenosGanaron ? (
+            <FaTrophy className="text-white text-3xl" />
+          ) : (
+            <FaUserSecret className="text-white text-3xl" />
+          )}
+        </div>
+        <h2 className={`text-4xl font-bold text-white mb-3 ${showResults ? 'animate-scale-in' : ''}`}>
+          {buenosGanaron ? '¡Los buenos ganaron!' : '¡Los impostores ganaron!'}
+        </h2>
+        <p className="text-lg text-purple-200/90 mb-6 text-center max-w-md">
+          {buenosGanaron
+            ? 'El impostor fue descubierto correctamente'
+            : 'Los impostores lograron engañar a todos'}
+        </p>
+      </div>
+
+      {/* Palabra secreta */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+        <p className="text-purple-200/70 text-sm text-center mb-2">La palabra secreta era</p>
+        <p className="text-white text-3xl font-bold text-center">{palabra}</p>
+      </div>
+
+      {/* Revelación de impostores */}
+      <div className="bg-gradient-to-br from-red-500/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-6 border border-red-400/30 w-full max-w-md">
+        <div className="text-center mb-4">
+          <FaUserSecret className="text-red-400 text-4xl mx-auto mb-3" />
+          <h3 className="text-2xl font-bold text-white mb-2">
+            {impostorIndices.length > 1 ? 'Los Impostores' : 'El Impostor'}
+          </h3>
+          <div className="flex flex-wrap justify-center gap-2">
+            {impostorIndices.map(idx => {
+              const player = players[idx - 1];
+              return (
+                <div key={idx} className="bg-red-500/30 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2">
+                  {player?.avatar && <span>{player.avatar}</span>}
+                  <span>{player?.nombre || `Jugador ${idx}`}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Estadísticas de votación */}
+      {votos.length > 0 && (
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 w-full max-w-md">
+          <h3 className="text-xl font-bold text-white mb-4 text-center">Resultados de votación</h3>
+          <div className="space-y-3">
+            {Object.entries(voteCount)
+              .sort((a, b) => b[1] - a[1])
+              .map(([player, count]) => {
+                const playerNum = parseInt(player);
+                const isImpostor = impostorIndices.includes(playerNum);
+                const playerData = players[playerNum - 1];
+                return (
+                  <div key={player} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      {playerData?.avatar && <span className="text-xl">{playerData.avatar}</span>}
+                      <span className="text-white font-bold">{playerData?.nombre || `Jugador ${player}`}</span>
+                      {isImpostor && (
+                        <FaUserSecret className="text-red-400" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-purple-200/70">{count} voto{count !== 1 ? 's' : ''}</span>
+                      {playerNum === mostVotedPlayer && (
+                        isImpostor ? (
+                          <FaCheckCircle className="text-green-400" />
+                        ) : (
+                          <FaTimesCircle className="text-red-400" />
+                        )
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <p className="text-purple-200/70 text-sm text-center">
+              Total de votos: {votos.length} de {numPlayers}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Botones de acción */}
+      <div className="flex gap-3 mt-4">
+        <button
+          onClick={() => {
+            const votosCorrectos = Object.entries(voteCount).filter(([player]) => {
+              const playerNum = parseInt(player);
+              return impostorIndices.includes(playerNum);
+            }).reduce((sum, [, count]) => sum + count, 0);
+
+            onShare({
+              buenosGanaron,
+              palabra,
+              totalJugadores: numPlayers,
+              impostores: impostorIndices.length,
+              votosCorrectos
+            });
+          }}
+          className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-4 rounded-xl text-lg font-bold shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          <FaShareAlt />
+          Compartir
+        </button>
+        <button
+          onClick={onReset}
+          className="flex-1 bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 text-white px-6 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-purple-500/50 hover:scale-105 active:scale-95 transition-all duration-200"
+        >
+          Nueva partida
+        </button>
+      </div>
     </div>
   );
 }
