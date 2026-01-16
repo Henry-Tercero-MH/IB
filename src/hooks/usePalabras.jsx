@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CATEGORIAS, getPalabrasPorDificultad } from '../data/palabras';
+import { getCategoriasPorModo, getPalabrasPorDificultad } from '../data/palabras';
 
 export function usePalabras() {
   const [palabrasPersonalizadas, setPalabrasPersonalizadas] = useState(() => {
@@ -32,21 +32,23 @@ export function usePalabras() {
     setPalabrasPersonalizadas([]);
   };
 
-  // Obtener palabras según categoría y dificultad
-  const obtenerPalabras = (categoria, dificultad) => {
+  // Obtener palabras según modo, categoría y dificultad
+  const obtenerPalabras = (categoria, dificultad, modo = 'biblico') => {
     if (categoria === 'personalizado') {
       return palabrasPersonalizadas.length > 0 ? palabrasPersonalizadas : [];
     }
 
+    const categorias = getCategoriasPorModo(modo);
+
     if (categoria === 'todas') {
-      // Mezclar todas las categorías
-      const todasPalabras = Object.keys(CATEGORIAS)
-        .flatMap(key => getPalabrasPorDificultad(key, dificultad));
+      // Mezclar todas las categorías del modo actual
+      const todasPalabras = Object.keys(categorias)
+        .flatMap(key => getPalabrasPorDificultad(categorias, key, dificultad));
       // Eliminar duplicados
       return [...new Set(todasPalabras)];
     }
 
-    return getPalabrasPorDificultad(categoria, dificultad);
+    return getPalabrasPorDificultad(categorias, categoria, dificultad);
   };
 
   return {

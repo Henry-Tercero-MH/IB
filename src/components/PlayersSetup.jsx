@@ -1,18 +1,25 @@
-import { useState } from 'react';
-import { FaUser, FaPlus, FaTrash, FaRandom } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaPlus, FaTrash, FaRandom } from 'react-icons/fa';
 import { BsLightningChargeFill } from 'react-icons/bs';
 
-const AVATARES = ['👤', '😊', '😎', '🤓', '😇', '🤩', '🥳', '🤠', '👨', '👩', '🧑', '👶', '👴', '👵', '🧔', '🧑‍🦰', '🧑‍🦱', '🧑‍🦲', '👨‍🦰', '👩‍🦰'];
-const NOMBRES_RANDOM = ['Pedro', 'María', 'Juan', 'Ana', 'David', 'Sara', 'José', 'Ruth', 'Daniel', 'Ester', 'Pablo', 'Rebeca', 'Moisés', 'Raquel', 'Isaías', 'Débora', 'Samuel', 'Miriam', 'Elías', 'Lea'];
+const AVATARES = ['👤', '😊', '😎', '🤓', '😇', '🤩', '🥳', '🤠', '👨', '👩', '🧑', '👶', '👴', '👵', '🧔', '🧑‍🦰', '🧑‍🦱', '🧑‍🦲', '👨‍🦰', '👩‍🦰', '👧', '👦', '🧒', '👨‍🦳', '👩‍🦳', '🧓', '👱', '👱‍♀️', '🧔‍♀️', '👳'];
+const NOMBRES_RANDOM = ['Pedro', 'María', 'Juan', 'Ana', 'David', 'Sara', 'José', 'Ruth', 'Daniel', 'Ester', 'Pablo', 'Rebeca', 'Moisés', 'Raquel', 'Isaías', 'Débora', 'Samuel', 'Miriam', 'Elías', 'Lea', 'Abraham', 'Isaac', 'Jacob', 'Noé', 'Eva', 'Adán', 'Salomón', 'Jonás', 'Job', 'Ezequiel'];
+
+const createPlayers = (count) => Array.from({ length: count }, (_, i) => ({
+  id: i + 1,
+  nombre: `Jugador ${i + 1}`,
+  avatar: AVATARES[i % AVATARES.length]
+}));
 
 export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onChangeNumPlayers }) {
-  const [players, setPlayers] = useState(() =>
-    Array.from({ length: numPlayers }, (_, i) => ({
-      id: i + 1,
-      nombre: `Jugador ${i + 1}`,
-      avatar: AVATARES[i % AVATARES.length]
-    }))
-  );
+  const [players, setPlayers] = useState(() => createPlayers(numPlayers));
+
+  // Sincronizar players cuando se abre el modal
+  useEffect(() => {
+    if (isOpen) {
+      setPlayers(createPlayers(numPlayers));
+    }
+  }, [isOpen, numPlayers]);
 
   if (!isOpen) return null;
 
@@ -41,15 +48,13 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
   };
 
   const handleAddPlayer = () => {
-    if (players.length < 10) {
-      const newId = players.length + 1;
-      setPlayers(prev => [...prev, {
-        id: newId,
-        nombre: `Jugador ${newId}`,
-        avatar: AVATARES[newId % AVATARES.length]
-      }]);
-      onChangeNumPlayers(players.length + 1);
-    }
+    const newId = players.length + 1;
+    setPlayers(prev => [...prev, {
+      id: newId,
+      nombre: `Jugador ${newId}`,
+      avatar: AVATARES[newId % AVATARES.length]
+    }]);
+    onChangeNumPlayers(players.length + 1);
   };
 
   const handleRemovePlayer = (id) => {
@@ -138,15 +143,13 @@ export default function PlayersSetup({ isOpen, onClose, onStart, numPlayers, onC
             ))}
           </div>
 
-          {/* Botón agregar jugador */}
-          {players.length < 10 && (
-            <button
-              onClick={handleAddPlayer}
-              className="mt-2 sm:mt-4 w-full py-2 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-dashed border-white/30 hover:border-purple-400/50 rounded-xl transition-all flex items-center justify-center gap-2 text-white font-bold text-xs sm:text-base"
-            >
-              <FaPlus /> Agregar jugador
-            </button>
-          )}
+          {/* Botón agregar jugador - sin límite máximo */}
+          <button
+            onClick={handleAddPlayer}
+            className="mt-2 sm:mt-4 w-full py-2 sm:py-4 bg-white/10 hover:bg-white/20 border-2 border-dashed border-white/30 hover:border-purple-400/50 rounded-xl transition-all flex items-center justify-center gap-2 text-white font-bold text-xs sm:text-base"
+          >
+            <FaPlus /> Agregar jugador
+          </button>
         </div>
 
         {/* Footer */}

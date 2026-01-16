@@ -1,11 +1,10 @@
 // Categorías de palabras bíblicas organizadas por temas
 
-export const CATEGORIAS = {
+export const CATEGORIAS_BIBLICAS = {
   mixto: {
     nombre: 'Mixto',
     emoji: '🎲',
     descripcion: 'Mezcla de todos los temas',
-    color: 'purple',
     palabras: [
       'Jonás', 'Arca', 'Maná', 'Goliat', 'Egipto', 'Pentecostés', 'Babel',
       'Betania', 'Cordero', 'Pascua', 'Sinaí', 'Éxodo', 'David', 'Salomón',
@@ -17,7 +16,6 @@ export const CATEGORIAS = {
     nombre: 'Personajes',
     emoji: '👤',
     descripcion: 'Personas de la Biblia',
-    color: 'blue',
     palabras: [
       'Moisés', 'Abraham', 'Isaac', 'Jacob', 'José', 'David', 'Salomón',
       'Daniel', 'Jonás', 'Elías', 'Eliseo', 'Ezequiel', 'Isaías', 'Jeremías',
@@ -31,7 +29,6 @@ export const CATEGORIAS = {
     nombre: 'Lugares',
     emoji: '📍',
     descripcion: 'Ciudades y lugares bíblicos',
-    color: 'green',
     palabras: [
       'Jerusalén', 'Belén', 'Nazaret', 'Galilea', 'Judea', 'Samaria',
       'Egipto', 'Canaán', 'Babilonia', 'Nínive', 'Sodoma', 'Gomorra',
@@ -44,7 +41,6 @@ export const CATEGORIAS = {
     nombre: 'Eventos',
     emoji: '⚡',
     descripcion: 'Sucesos importantes',
-    color: 'amber',
     palabras: [
       'Creación', 'Diluvio', 'Éxodo', 'Pascua', 'Pentecostés', 'Navidad',
       'Crucifixión', 'Resurrección', 'Ascensión', 'Bautismo', 'Transfiguración',
@@ -57,7 +53,6 @@ export const CATEGORIAS = {
     nombre: 'Objetos',
     emoji: '🏺',
     descripcion: 'Objetos y símbolos',
-    color: 'orange',
     palabras: [
       'Arca', 'Cruz', 'Corona', 'Espada', 'Copa', 'Pan', 'Vino',
       'Aceite', 'Incienso', 'Mirra', 'Altar', 'Templo', 'Tabernáculo',
@@ -70,7 +65,6 @@ export const CATEGORIAS = {
     nombre: 'Animales',
     emoji: '🐑',
     descripcion: 'Animales mencionados',
-    color: 'emerald',
     palabras: [
       'Cordero', 'León', 'Serpiente', 'Paloma', 'Águila', 'Oveja',
       'Cabra', 'Burro', 'Camello', 'Pez', 'Leviatán', 'Behemot',
@@ -83,7 +77,6 @@ export const CATEGORIAS = {
     nombre: 'Libros',
     emoji: '📖',
     descripcion: 'Libros de la Biblia',
-    color: 'indigo',
     palabras: [
       'Génesis', 'Éxodo', 'Levítico', 'Números', 'Deuteronomio',
       'Josué', 'Jueces', 'Rut', 'Samuel', 'Reyes', 'Crónicas',
@@ -103,7 +96,6 @@ export const CATEGORIAS = {
     nombre: 'Conceptos',
     emoji: '✨',
     descripcion: 'Conceptos espirituales',
-    color: 'violet',
     palabras: [
       'Fe', 'Gracia', 'Salvación', 'Redención', 'Perdón', 'Amor',
       'Paz', 'Esperanza', 'Justicia', 'Misericordia', 'Santidad',
@@ -114,19 +106,174 @@ export const CATEGORIAS = {
   }
 };
 
+// Categorías de palabras normales (no bíblicas)
+export const CATEGORIAS_NORMALES = {
+  mixto: {
+    nombre: 'Mixto',
+    emoji: '🎲',
+    descripcion: 'Mezcla de todos los temas',
+    palabras: [
+      'Pizza', 'Playa', 'Fútbol', 'Guitarra', 'Montaña', 'Helado',
+      'Avión', 'Computadora', 'Perro', 'Fiesta', 'Música', 'Café',
+      'Bicicleta', 'Teléfono', 'Libro', 'Cine', 'Doctor', 'Escuela'
+    ]
+  },
+
+  comida: {
+    nombre: 'Comida',
+    emoji: '🍕',
+    descripcion: 'Alimentos y bebidas',
+    palabras: [
+      'Pizza', 'Hamburguesa', 'Tacos', 'Sushi', 'Pasta', 'Ensalada',
+      'Helado', 'Chocolate', 'Galleta', 'Pastel', 'Pollo', 'Carne',
+      'Pescado', 'Arroz', 'Frijoles', 'Sopa', 'Pan', 'Queso',
+      'Huevo', 'Fruta', 'Manzana', 'Plátano', 'Naranja', 'Uva',
+      'Sandía', 'Café', 'Té', 'Jugo', 'Leche', 'Agua'
+    ]
+  },
+
+  animales: {
+    nombre: 'Animales',
+    emoji: '🐶',
+    descripcion: 'Animales comunes',
+    palabras: [
+      'Perro', 'Gato', 'León', 'Elefante', 'Tigre', 'Oso',
+      'Mono', 'Jirafa', 'Cebra', 'Caballo', 'Vaca', 'Cerdo',
+      'Gallina', 'Pato', 'Conejo', 'Ratón', 'Serpiente', 'Tortuga',
+      'Pez', 'Tiburón', 'Delfín', 'Ballena', 'Águila', 'Loro',
+      'Mariposa', 'Abeja', 'Araña', 'Hormiga', 'Lobo', 'Zorro'
+    ]
+  },
+
+  deportes: {
+    nombre: 'Deportes',
+    emoji: '⚽',
+    descripcion: 'Deportes y actividades',
+    palabras: [
+      'Fútbol', 'Baloncesto', 'Béisbol', 'Tenis', 'Golf', 'Natación',
+      'Boxeo', 'Karate', 'Gimnasia', 'Atletismo', 'Voleibol', 'Rugby',
+      'Hockey', 'Surf', 'Esquí', 'Patinaje', 'Ciclismo', 'Maratón',
+      'Escalada', 'Yoga', 'Pesas', 'Crossfit', 'Carrera', 'Salto'
+    ]
+  },
+
+  profesiones: {
+    nombre: 'Profesiones',
+    emoji: '👨‍⚕️',
+    descripcion: 'Trabajos y oficios',
+    palabras: [
+      'Doctor', 'Enfermera', 'Maestro', 'Abogado', 'Ingeniero', 'Arquitecto',
+      'Chef', 'Mesero', 'Policía', 'Bombero', 'Piloto', 'Astronauta',
+      'Actor', 'Cantante', 'Músico', 'Pintor', 'Escritor', 'Fotógrafo',
+      'Dentista', 'Veterinario', 'Jardinero', 'Carpintero', 'Mecánico', 'Electricista',
+      'Plomero', 'Panadero', 'Carnicero', 'Granjero', 'Pescador', 'Minero'
+    ]
+  },
+
+  lugares: {
+    nombre: 'Lugares',
+    emoji: '🏠',
+    descripcion: 'Lugares comunes',
+    palabras: [
+      'Casa', 'Escuela', 'Hospital', 'Parque', 'Playa', 'Montaña',
+      'Bosque', 'Desierto', 'Ciudad', 'Pueblo', 'Campo', 'Río',
+      'Lago', 'Mar', 'Isla', 'Aeropuerto', 'Estación', 'Museo',
+      'Teatro', 'Cine', 'Restaurante', 'Hotel', 'Supermercado', 'Tienda',
+      'Biblioteca', 'Iglesia', 'Estadio', 'Gimnasio', 'Zoo', 'Circo'
+    ]
+  },
+
+  objetos: {
+    nombre: 'Objetos',
+    emoji: '📱',
+    descripcion: 'Objetos cotidianos',
+    palabras: [
+      'Teléfono', 'Computadora', 'Televisión', 'Radio', 'Reloj', 'Cámara',
+      'Libro', 'Lápiz', 'Papel', 'Tijeras', 'Silla', 'Mesa',
+      'Cama', 'Lámpara', 'Espejo', 'Llave', 'Bolsa', 'Zapato',
+      'Camisa', 'Pantalón', 'Sombrero', 'Gafas', 'Paraguas', 'Maleta',
+      'Cuchillo', 'Tenedor', 'Cuchara', 'Plato', 'Vaso', 'Taza'
+    ]
+  },
+
+  transporte: {
+    nombre: 'Transporte',
+    emoji: '🚗',
+    descripcion: 'Medios de transporte',
+    palabras: [
+      'Carro', 'Camión', 'Autobús', 'Taxi', 'Motocicleta', 'Bicicleta',
+      'Avión', 'Helicóptero', 'Barco', 'Yate', 'Submarino', 'Tren',
+      'Metro', 'Tranvía', 'Patineta', 'Patines', 'Scooter', 'Ambulancia',
+      'Bombero', 'Policía', 'Cohete', 'Globo', 'Canoa', 'Kayak'
+    ]
+  },
+
+  peliculas: {
+    nombre: 'Películas',
+    emoji: '🎬',
+    descripcion: 'Películas famosas',
+    palabras: [
+      'Titanic', 'Avatar', 'Frozen', 'Shrek', 'Coco', 'Moana',
+      'Matrix', 'Terminator', 'Jurassic Park', 'Star Wars', 'Batman', 'Superman',
+      'Spiderman', 'Iron Man', 'Thor', 'Hulk', 'Toy Story', 'Nemo',
+      'Rey León', 'Aladdin', 'Cenicienta', 'Blancanieves', 'Rapunzel', 'Encanto'
+    ]
+  }
+};
+
+// Modos de juego
+export const MODOS_JUEGO = {
+  biblico: {
+    nombre: 'Bíblico',
+    emoji: '✝️',
+    descripcion: 'Palabras de la Biblia',
+    categorias: CATEGORIAS_BIBLICAS
+  },
+  normal: {
+    nombre: 'Normal',
+    emoji: '🎮',
+    descripcion: 'Palabras cotidianas',
+    categorias: CATEGORIAS_NORMALES
+  }
+};
+
+// Exportar CATEGORIAS como alias para compatibilidad (por defecto bíblico)
+export const CATEGORIAS = CATEGORIAS_BIBLICAS;
+
+// Niveles de dificultad
+export const DIFICULTADES = {
+  facil: {
+    nombre: 'Fácil',
+    emoji: '😊',
+    descripcion: 'Palabras cortas y conocidas'
+  },
+  medio: {
+    nombre: 'Medio',
+    emoji: '🤔',
+    descripcion: 'Balance de palabras'
+  },
+  dificil: {
+    nombre: 'Difícil',
+    emoji: '😰',
+    descripcion: 'Palabras largas y complejas'
+  }
+};
+
+// Función para obtener categorías según el modo
+export const getCategoriasPorModo = (modo) => {
+  return MODOS_JUEGO[modo]?.categorias || CATEGORIAS_BIBLICAS;
+};
+
 // Función para obtener palabras según dificultad
-export const getPalabrasPorDificultad = (categoria, dificultad) => {
-  const palabras = CATEGORIAS[categoria].palabras;
+export const getPalabrasPorDificultad = (categorias, categoria, dificultad) => {
+  const palabras = categorias[categoria]?.palabras || [];
 
   switch(dificultad) {
     case 'facil':
-      // Palabras más cortas y conocidas
       return palabras.filter(p => p.length <= 8).slice(0, 15);
     case 'medio':
-      // Todas las palabras
       return palabras;
     case 'dificil':
-      // Palabras más largas y menos comunes
       return palabras.filter(p => p.length >= 6);
     default:
       return palabras;
@@ -134,30 +281,7 @@ export const getPalabrasPorDificultad = (categoria, dificultad) => {
 };
 
 // Función para obtener todas las palabras de todas las categorías
-export const getAllPalabras = () => {
-  const todasPalabras = Object.values(CATEGORIAS).flatMap(cat => cat.palabras);
-  // Eliminar duplicados
+export const getAllPalabras = (categorias) => {
+  const todasPalabras = Object.values(categorias).flatMap(cat => cat.palabras);
   return [...new Set(todasPalabras)];
-};
-
-// Niveles de dificultad
-export const DIFICULTADES = {
-  facil: {
-    nombre: 'Fácil',
-    emoji: '😊',
-    descripcion: 'Palabras cortas y conocidas',
-    color: 'green'
-  },
-  medio: {
-    nombre: 'Medio',
-    emoji: '🤔',
-    descripcion: 'Balance de palabras',
-    color: 'yellow'
-  },
-  dificil: {
-    nombre: 'Difícil',
-    emoji: '😰',
-    descripcion: 'Palabras largas y complejas',
-    color: 'red'
-  }
 };

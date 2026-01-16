@@ -32,6 +32,7 @@ export function useGameState() {
     current: 0,
     categoria: 'mixto',
     dificultad: 'medio',
+    modo: 'biblico', // 'biblico' o 'normal'
     timestamp: Date.now()
   };
 
@@ -69,6 +70,7 @@ export function useGameState() {
       current: 0,
       categoria: 'mixto',
       dificultad: 'medio',
+      modo: 'biblico',
       timestamp: Date.now()
     };
     setGameState(resetState);

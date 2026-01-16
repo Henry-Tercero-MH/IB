@@ -14,18 +14,20 @@ import InstallPWA from './components/InstallPWA';
 import RestoreGameDialog from './components/RestoreGameDialog';
 import PlayersSetup from './components/PlayersSetup';
 import ShareResults from './components/ShareResults';
-import { CATEGORIAS, DIFICULTADES } from './data/palabras';
+import ModeSelector from './components/ModeSelector';
+import { MODOS_JUEGO, DIFICULTADES, getCategoriasPorModo } from './data/palabras';
 
 function App() {
   // Hook de persistencia
   const { gameState, updateGameState, resetGame, clearSavedGame, hasSavedGame, gameAge } = useGameState();
 
-  // Estado local para modales
+  // Estado local para modales y pantallas
   const [showPalabrasModal, setShowPalabrasModal] = useState(false);
   const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [showPlayersSetup, setShowPlayersSetup] = useState(false);
   const [showShareResults, setShowShareResults] = useState(false);
   const [shareData, setShareData] = useState(null);
+  const [showModeSelector, setShowModeSelector] = useState(!gameState.modo || gameState.step === 'setup');
 
   // Hooks
   const { playSound } = useAudio();
@@ -55,7 +57,7 @@ function App() {
   const handleStart = () => {
     if (gameState.numPlayers < 3 || gameState.numImpostores < 1 || gameState.numImpostores >= gameState.numPlayers) return;
 
-    const palabrasDisponibles = obtenerPalabras(gameState.categoria, gameState.dificultad);
+    const palabrasDisponibles = obtenerPalabras(gameState.categoria, gameState.dificultad, gameState.modo);
 
     if (palabrasDisponibles.length === 0) {
       alert('No hay palabras disponibles. Agrega palabras personalizadas primero.');
@@ -70,7 +72,7 @@ function App() {
     setShowPlayersSetup(false);
     playSound('gameStart');
 
-    const palabrasDisponibles = obtenerPalabras(gameState.categoria, gameState.dificultad);
+    const palabrasDisponibles = obtenerPalabras(gameState.categoria, gameState.dificultad, gameState.modo);
     const palabraElegida = palabrasDisponibles[Math.floor(Math.random() * palabrasDisponibles.length)];
     const cartasArr = Array(gameState.numImpostores).fill({ rol: 'impostor' }).concat(
       Array(gameState.numPlayers - gameState.numImpostores).fill({ rol: 'palabra', palabra: palabraElegida })
@@ -129,6 +131,7 @@ function App() {
   const handleReset = () => {
     playSound('buttonClick');
     resetGame();
+    setShowModeSelector(true);
   };
 
   const handleRestoreGame = () => {
@@ -141,6 +144,17 @@ function App() {
     clearSavedGame();
     playSound('buttonClick');
   };
+
+  const handleModeSelect = (modo) => {
+    playSound('gameStart');
+    updateGameState({ modo, categoria: 'mixto' });
+    setShowModeSelector(false);
+  };
+
+  // Mostrar selector de modo Matrix
+  if (showModeSelector && gameState.step === 'setup') {
+    return <ModeSelector onSelectMode={handleModeSelect} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-900 animate-gradient py-10 px-4 relative overflow-hidden">
@@ -180,14 +194,22 @@ function App() {
       </div>
 
       <div className="max-w-4xl mx-auto relative">
-        {/* Header */}
+        {/* Header - Dinámico según el modo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-full backdrop-blur-sm">
-            <FaUserSecret className="text-amber-400 text-xl" />
-            <span className="text-amber-200 text-sm font-medium tracking-wide">JUEGO BÍBLICO</span>
+          <div className={`inline-flex items-center gap-2 mb-4 px-4 py-2 ${gameState.modo === 'biblico' ? 'bg-amber-500/20 border-amber-500/30' : 'bg-green-500/20 border-green-500/30'} border rounded-full backdrop-blur-sm`}>
+            {gameState.modo === 'biblico' ? (
+              <FaUserSecret className="text-amber-400 text-xl" />
+            ) : (
+              <span className="text-xl">🎮</span>
+            )}
+            <span className={`${gameState.modo === 'biblico' ? 'text-amber-200' : 'text-green-200'} text-sm font-medium tracking-wide`}>
+              {gameState.modo === 'biblico' ? 'JUEGO BÍBLICO' : 'JUEGO NORMAL'}
+            </span>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight">
-            Impostor <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-purple-300 to-blue-300">Bíblico</span>
+            Impostor <span className={`text-transparent bg-clip-text bg-gradient-to-r ${gameState.modo === 'biblico' ? 'from-amber-300 via-purple-300 to-blue-300' : 'from-green-300 via-blue-300 to-purple-300'}`}>
+              {gameState.modo === 'biblico' ? 'Bíblico' : 'Normal'}
+            </span>
           </h1>
           <p className="text-purple-200/70 text-lg">Descubre quién es el impostor entre ustedes</p>
         </div>
@@ -196,7 +218,24 @@ function App() {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 md:p-10">
           {gameState.step === 'setup' && (
             <div className="flex flex-col gap-6">
-              {/* Selección de Categoría */}
+              {/* Indicador del modo actual con botón para cambiar */}
+              <div className="flex items-center justify-between bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{MODOS_JUEGO[gameState.modo]?.emoji}</span>
+                  <div>
+                    <p className="text-white font-bold">Modo {MODOS_JUEGO[gameState.modo]?.nombre}</p>
+                    <p className="text-purple-200/60 text-xs">{MODOS_JUEGO[gameState.modo]?.descripcion}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowModeSelector(true)}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-sm flex items-center gap-2"
+                >
+                  🔄 Cambiar
+                </button>
+              </div>
+
+              {/* Selección de Categoría - Dinámico según modo */}
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <label className="text-base md:text-lg font-semibold text-white flex items-center gap-2 break-words">
@@ -212,7 +251,7 @@ function App() {
                   )}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {Object.entries(CATEGORIAS).map(([key, cat]) => (
+                  {Object.entries(getCategoriasPorModo(gameState.modo)).map(([key, cat]) => (
                     <button
                       key={key}
                       onClick={() => {
@@ -290,9 +329,8 @@ function App() {
                 <input
                   type="number"
                   min="3"
-                  max="10"
                   value={gameState.numPlayers}
-                  onChange={(e) => updateGameState({ numPlayers: Math.min(10, Math.max(3, parseInt(e.target.value) || 3)) })}
+                  onChange={(e) => updateGameState({ numPlayers: Math.max(3, parseInt(e.target.value) || 3) })}
                   className="w-full p-3 md:p-4 rounded-xl bg-white/10 border border-white/20 text-white text-lg md:text-xl font-bold focus:ring-2 focus:ring-purple-400 focus:border-transparent focus:outline-none transition-all placeholder-purple-200/50"
                 />
                 <p className="text-purple-200/60 text-sm mt-2">Mínimo 3 jugadores</p>
@@ -459,11 +497,10 @@ function CardReveal({ palabra, carta, jugador, total, onNext, player }) {
         <span className="text-white/60 text-sm">({jugador} de {total})</span>
       </div>
 
-      {/* Carta interactiva con efecto 3D */}
-      <div className="relative perspective-1000">
+      {/* Carta interactiva */}
+      <div className="relative">
         <div
-          className={`w-72 h-[450px] flex items-center justify-center cursor-pointer relative select-none group transition-all duration-500 ${reveal ? 'animate-flip-3d' : ''}`}
-          style={{ transformStyle: 'preserve-3d' }}
+          className="w-64 sm:w-72 h-[400px] sm:h-[450px] flex items-center justify-center cursor-pointer relative select-none group transition-all duration-300"
           onMouseDown={handlePress}
           onMouseUp={handleRelease}
           onMouseLeave={handleRelease}
@@ -486,22 +523,22 @@ function CardReveal({ palabra, carta, jugador, total, onNext, player }) {
             </div>
           )}
 
-          {/* Card destapada */}
-          <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl shadow-2xl border-4 transition-all duration-500 ${
-            esImpostor
-              ? 'bg-gradient-to-br from-red-600 via-red-500 to-orange-600 border-red-400/50'
-              : 'bg-gradient-to-br from-emerald-500 via-teal-500 to-blue-500 border-emerald-400/50'
-          } ${reveal ? 'opacity-100 scale-100 animate-bounce-in' : 'opacity-0 scale-90'}`}>
+          {/* Card destapada - MISMO COLOR para todos, nadie puede ver quién es impostor */}
+          <div className={`absolute inset-0 flex flex-col items-center justify-center rounded-3xl shadow-2xl border-4 transition-all duration-500 bg-gradient-to-br from-purple-600 via-indigo-500 to-blue-600 border-purple-400/50 ${reveal ? 'opacity-100 scale-100 animate-bounce-in' : 'opacity-0 scale-90'}`}>
             <div className="text-center p-8">
-              {esImpostor && (
-                <FaUserSecret className="text-white/80 text-6xl mb-4 mx-auto animate-scale-in" />
-              )}
-              <span className={`text-white text-5xl font-black tracking-wide uppercase ${reveal ? 'animate-scale-in' : ''}`}>
-                {esImpostor ? 'Impostor' : palabra}
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                {esImpostor ? (
+                  <FaUserSecret className="text-white text-3xl" />
+                ) : (
+                  <span className="text-3xl">📖</span>
+                )}
+              </div>
+              <span className={`text-white text-3xl sm:text-4xl font-black ${reveal ? 'animate-scale-in' : ''}`}>
+                {esImpostor ? 'IMPOSTOR' : palabra}
               </span>
-              {!esImpostor && (
-                <p className="text-white/70 text-sm mt-4 font-medium">Palabra secreta</p>
-              )}
+              <p className="text-white/70 text-sm mt-4 font-medium">
+                {esImpostor ? 'No tienes palabra' : 'Tu palabra secreta'}
+              </p>
             </div>
           </div>
         </div>
@@ -780,7 +817,7 @@ function ResultsPhase({ cartas, votos, numPlayers, palabra, onReset, players, on
   );
 }
 
-// Función shuffle para mezclar cartas
+// Función shuffle  epara mezclar cartas
 function shuffle(array) {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {
